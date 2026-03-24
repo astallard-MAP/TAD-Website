@@ -12,16 +12,17 @@ import { storage } from '@/lib/firebase';
 import { UserProfile } from '@/lib/types';
 
 type Tab = 'DASHBOARD' | 'PROFILE' | 'REQUIREMENTS' | 'SAVED' | 'BIDS' | 'SETTINGS' | 'ADMIN_CONSOLE';
+type ProfileSubTab = 'IDENTITY' | 'BIDDING';
 
 export default function ProfilePage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<Tab>('DASHBOARD');
-  const [profileSubTab, setProfileSubTab] = useState<'IDENTITY' | 'CONTACT' | 'SECURITY'>('IDENTITY');
+  const [profileSubTab, setProfileSubTab] = useState<ProfileSubTab>('IDENTITY');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   
   // Real User Data from Firestore
-  const [profile, setProfile] = useState<Partial<UserProfile & { role: string; status: string; branch: string }>>({
+  const [profile, setProfile] = useState<Partial<UserProfile & { role: string; status: string; branch: string; idProof?: string; addressProof?: string }>>({
     uid: '',
     firstName: '',
     surname: '',
@@ -68,59 +69,6 @@ export default function ProfilePage() {
     return () => unsubscribe();
   }, [router]);
 
-  const handleUpdateIdentity = async () => {
-    if (!auth.currentUser) return;
-    setIsSaving(true);
-    try {
-      // 1. Update Auth
-      await updateAuthProfile(auth.currentUser, { displayName: profile.displayName });
-      
-      // 2. Update Firestore
-      const docRef = doc(db, "users", auth.currentUser.uid);
-      await setDoc(docRef, {
-        firstName: profile.firstName,
-        surname: profile.surname,
-        displayName: profile.displayName,
-        workEmail: profile.workEmail || '',
-        homeEmail: profile.homeEmail || '',
-        title: profile.title || '',
-        role: profile.role || 'Member',
-        status: profile.status || 'Active'
-      }, { merge: true });
-      alert('Identity details updated successfully!');
-    } catch (error) {
-      console.error("Update identity failed:", error);
-      alert('Failed to update identity details.');
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleUpdateContact = async () => {
-    if (!auth.currentUser) return;
-    setIsSaving(true);
-    try {
-      const docRef = doc(db, "users", auth.currentUser.uid);
-      await setDoc(docRef, {
-        mobile: profile.mobile || '',
-        telephone: profile.telephone || '',
-        addressLine1: profile.addressLine1 || '',
-        addressLine2: profile.addressLine2 || '',
-        townCity: profile.townCity || '',
-        county: profile.county || '',
-        postcode: profile.postcode || '',
-        country: profile.country || 'United Kingdom',
-        role: profile.role || 'Member'
-      }, { merge: true });
-      alert('Contact information updated successfully!');
-    } catch (error) {
-      console.error("Update contact failed:", error);
-      alert('Failed to update contact information.');
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !auth.currentUser) return;
@@ -145,6 +93,61 @@ export default function ProfilePage() {
     } catch (error) {
       console.error("Avatar upload failed:", error);
       alert('Failed to upload profile picture.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDocumentUpload = async (e: React.ChangeEvent<HTMLInputElement>, docType: 'idProof' | 'addressProof') => {
+    const file = e.target.files?.[0];
+    if (!file || !auth.currentUser) return;
+
+    setIsSaving(true);
+    try {
+      const storageRef = ref(storage, `documents/${auth.currentUser.uid}/${docType}`);
+      await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(storageRef);
+
+      const docRef = doc(db, "users", auth.currentUser.uid);
+      await setDoc(docRef, { [docType]: downloadURL }, { merge: true });
+
+      setProfile({ ...profile, [docType]: downloadURL } as any);
+      alert(`${docType === 'idProof' ? 'Photographic Proof' : 'Address Proof'} updated!`);
+    } catch (error) {
+      console.error("Document upload failed:", error);
+      alert('Failed to upload document.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleUpdateFullProfile = async () => {
+    if (!auth.currentUser) return;
+    setIsSaving(true);
+    try {
+      const docRef = doc(db, "users", auth.currentUser.uid);
+      await setDoc(docRef, {
+        firstName: profile.firstName,
+        surname: profile.surname,
+        displayName: profile.displayName,
+        workEmail: profile.workEmail || '',
+        homeEmail: profile.homeEmail || '',
+        title: profile.title || '',
+        mobile: profile.mobile || '',
+        telephone: profile.telephone || '',
+        addressLine1: profile.addressLine1 || '',
+        addressLine2: profile.addressLine2 || '',
+        townCity: profile.townCity || '',
+        county: profile.county || '',
+        postcode: profile.postcode || '',
+        country: profile.country || 'United Kingdom',
+        role: profile.role || 'Member',
+        status: profile.status || 'Active'
+      }, { merge: true });
+      alert('Profile updated successfully!');
+    } catch (error) {
+      console.error("Profile update failed:", error);
+      alert('Failed to update profile.');
     } finally {
       setIsSaving(false);
     }
@@ -242,8 +245,7 @@ export default function ProfilePage() {
         return (
           <div className={styles.dashboard}>
             <header className={styles.dashHeader}>
-              <h1>User Management</h1>
-              <p>Mirroring your profile configuration from our integrated platforms.</p>
+              <h1>My Profile</h1>
             </header>
             
             <nav className={styles.tabNav}>
@@ -251,200 +253,192 @@ export default function ProfilePage() {
                 className={`${styles.tabLink} ${profileSubTab === 'IDENTITY' ? styles.activeTab : ''}`}
                 onClick={() => setProfileSubTab('IDENTITY')}
               >
-                Identity
+                Profile Details
               </div>
               <div 
-                className={`${styles.tabLink} ${profileSubTab === 'CONTACT' ? styles.activeTab : ''}`}
-                onClick={() => setProfileSubTab('CONTACT')}
+                className={`${styles.tabLink} ${profileSubTab === 'BIDDING' ? styles.activeTab : ''}`}
+                onClick={() => setProfileSubTab('BIDDING')}
               >
-                Contact
-              </div>
-              <div 
-                className={`${styles.tabLink} ${profileSubTab === 'SECURITY' ? styles.activeTab : ''}`}
-                onClick={() => setProfileSubTab('SECURITY')}
-              >
-                Security
+                Bidding Profile
               </div>
             </nav>
 
             {profileSubTab === 'IDENTITY' && (
-              <div className={styles.section}>
-                <h3><span className={styles.sideIcon}>🛡️</span> Name Details & Emails</h3>
-                <form className={styles.formGrid}>
-                  <div className={styles.formGroup}>
-                    <label>Title</label>
-                    <select 
-                      value={profile.title || ''} 
-                      onChange={(e) => setProfile({...profile, title: e.target.value})}
-                    >
-                      <option value="">Select...</option>
-                      <option>Mr</option>
-                      <option>Mrs</option>
-                      <option>Ms</option>
-                      <option>Dr</option>
-                    </select>
+              <div className={styles.profileOverhaul}>
+                <div className={styles.splitLayout}>
+                  <div className={styles.splitSection}>
+                    <h3><span className={styles.sideIcon}>👤</span> Name</h3>
+                    <form className={styles.formGridCompact}>
+                      <div className={styles.formGroup}>
+                        <label>Title</label>
+                        <select 
+                          value={profile.title || ''} 
+                          onChange={(e) => setProfile({...profile, title: e.target.value})}
+                        >
+                          <option value="">Select...</option>
+                          <option>Mr</option>
+                          <option>Mrs</option>
+                          <option>Ms</option>
+                          <option>Dr</option>
+                        </select>
+                      </div>
+                      <div className={styles.formGroup}>
+                        <label>First Name</label>
+                        <input 
+                          type="text" 
+                          value={profile.firstName} 
+                          onChange={(e) => setProfile({...profile, firstName: e.target.value})}
+                        />
+                      </div>
+                      <div className={styles.formGroup}>
+                        <label>Surname</label>
+                        <input 
+                          type="text" 
+                          value={profile.surname} 
+                          onChange={(e) => setProfile({...profile, surname: e.target.value})}
+                        />
+                      </div>
+                      <div className={styles.formGroup}>
+                        <label>Display Name</label>
+                        <input 
+                          type="text" 
+                          value={profile.displayName} 
+                          onChange={(e) => setProfile({...profile, displayName: e.target.value})}
+                        />
+                      </div>
+                      <div className={styles.fullWidth}>
+                        <label>Email Address</label>
+                        <input 
+                          type="email" 
+                          value={profile.email || ''} 
+                          disabled
+                        />
+                      </div>
+                    </form>
                   </div>
-                  <div className={styles.formGroup}>
-                    <label>First Name</label>
-                    <input 
-                      type="text" 
-                      value={profile.firstName} 
-                      onChange={(e) => setProfile({...profile, firstName: e.target.value})}
-                    />
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label>Surname</label>
-                    <input 
-                      type="text" 
-                      value={profile.surname} 
-                      onChange={(e) => setProfile({...profile, surname: e.target.value})}
-                    />
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label>Display Name</label>
-                    <input 
-                      type="text" 
-                      value={profile.displayName} 
-                      onChange={(e) => setProfile({...profile, displayName: e.target.value})}
-                    />
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label>Work Email</label>
-                    <input 
-                      type="email" 
-                      value={profile.workEmail || ''} 
-                      onChange={(e) => setProfile({...profile, workEmail: e.target.value})}
-                    />
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label>Home Email</label>
-                    <input 
-                      type="email" 
-                      value={profile.homeEmail || ''} 
-                      onChange={(e) => setProfile({...profile, homeEmail: e.target.value})}
-                    />
-                  </div>
-                  <div className={styles.fullWidth}>
-                    <button 
-                      type="button" 
-                      className={styles.saveBtn} 
-                      onClick={handleUpdateIdentity}
-                      disabled={isSaving}
-                    >
-                      {isSaving ? 'Updating...' : 'Update Identity Details'}
-                    </button>
-                  </div>
-                </form>
-              </div>
-            )}
 
-            {profileSubTab === 'CONTACT' && (
-              <div className={styles.section}>
-                <h3><span className={styles.sideIcon}>📞</span> Contact & Address</h3>
-                <form className={styles.formGrid}>
-                  <div className={styles.formGroup}>
-                    <label>Mobile Number</label>
-                    <input 
-                      type="tel" 
-                      value={profile.mobile || ''} 
-                      onChange={(e) => setProfile({...profile, mobile: e.target.value})}
-                    />
+                  <div className={styles.splitSection}>
+                    <h3><span className={styles.sideIcon}>📍</span> Address</h3>
+                    <form className={styles.formGridCompact}>
+                      <div className={styles.fullWidth}>
+                        <label>Address Line 1</label>
+                        <input 
+                          type="text" 
+                          value={profile.addressLine1 || ''} 
+                          onChange={(e) => setProfile({...profile, addressLine1: e.target.value})}
+                        />
+                      </div>
+                      <div className={styles.fullWidth}>
+                        <label>Address Line 2 (Optional)</label>
+                        <input 
+                          type="text" 
+                          value={profile.addressLine2 || ''} 
+                          onChange={(e) => setProfile({...profile, addressLine2: e.target.value})}
+                        />
+                      </div>
+                      <div className={styles.formGroup}>
+                        <label>Town / City</label>
+                        <input 
+                          type="text" 
+                          value={profile.townCity || ''} 
+                          onChange={(e) => setProfile({...profile, townCity: e.target.value})}
+                        />
+                      </div>
+                      <div className={styles.formGroup}>
+                        <label>County</label>
+                        <input 
+                          type="text" 
+                          value={profile.county || ''} 
+                          onChange={(e) => setProfile({...profile, county: e.target.value})}
+                        />
+                      </div>
+                      <div className={styles.formGroup}>
+                        <label>Postcode</label>
+                        <input 
+                          type="text" 
+                          value={profile.postcode || ''} 
+                          onChange={(e) => setProfile({...profile, postcode: e.target.value})}
+                        />
+                      </div>
+                      <div className={styles.formGroup}>
+                        <label>Country</label>
+                        <input 
+                          type="text" 
+                          value={profile.country || 'United Kingdom'} 
+                          onChange={(e) => setProfile({...profile, country: e.target.value})}
+                        />
+                      </div>
+                    </form>
                   </div>
-                  <div className={styles.formGroup}>
-                    <label>Landline (Telephone)</label>
-                    <input 
-                      type="tel" 
-                      value={profile.telephone || ''} 
-                      onChange={(e) => setProfile({...profile, telephone: e.target.value})}
-                    />
-                  </div>
-                  <div className={styles.fullWidth} style={{display: 'flex', flexDirection: 'column', gap: '0.8rem'}}>
-                    <label>Address Line 1</label>
-                    <input 
-                      type="text" 
-                      value={profile.addressLine1 || ''} 
-                      onChange={(e) => setProfile({...profile, addressLine1: e.target.value})}
-                    />
-                  </div>
-                  <div className={styles.fullWidth} style={{display: 'flex', flexDirection: 'column', gap: '0.8rem'}}>
-                    <label>Address Line 2 (Optional)</label>
-                    <input 
-                      type="text" 
-                      value={profile.addressLine2 || ''} 
-                      onChange={(e) => setProfile({...profile, addressLine2: e.target.value})}
-                    />
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label>Town / City</label>
-                    <input 
-                      type="text" 
-                      value={profile.townCity || ''} 
-                      onChange={(e) => setProfile({...profile, townCity: e.target.value})}
-                    />
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label>County</label>
-                    <input 
-                      type="text" 
-                      value={profile.county || ''} 
-                      onChange={(e) => setProfile({...profile, county: e.target.value})}
-                    />
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label>Postcode</label>
-                    <input 
-                      type="text" 
-                      value={profile.postcode || ''} 
-                      onChange={(e) => setProfile({...profile, postcode: e.target.value})}
-                    />
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label>Country</label>
-                    <input 
-                      type="text" 
-                      value={profile.country || 'United Kingdom'} 
-                      onChange={(e) => setProfile({...profile, country: e.target.value})}
-                    />
-                  </div>
-                  <div className={styles.fullWidth}>
-                    <button 
-                      type="button" 
-                      className={styles.saveBtn} 
-                      onClick={handleUpdateContact}
-                      disabled={isSaving}
-                    >
-                      {isSaving ? 'Updating...' : 'Update Contact Info'}
-                    </button>
-                  </div>
-                </form>
-              </div>
-            )}
-
-            {profileSubTab === 'SECURITY' && (
-              <div className={styles.section}>
-                <div className={styles.securityNote}>
-                  <span>⚠️</span>
-                  <p>Security and role-based permissions can only be modified by a system administrator.</p>
                 </div>
-                <h3><span className={styles.sideIcon}>🔐</span> Admin Settings</h3>
-                <form className={styles.formGrid}>
-                  <div className={styles.formGroup}>
-                    <label>Access Role</label>
-                    <input type="text" value={profile.role} disabled />
+                
+                <div className={styles.saveContainer}>
+                  <button 
+                    type="button" 
+                    className={styles.saveBtn} 
+                    onClick={handleUpdateFullProfile}
+                    disabled={isSaving}
+                  >
+                    {isSaving ? 'Saving Changes...' : 'Save My Profile'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {profileSubTab === 'BIDDING' && (
+              <div className={styles.section}>
+                <h3><span className={styles.sideIcon}>🔨</span> Bidding Profile & AML Compliance</h3>
+                <p className={styles.amlIntro}>To participate in our auctions, UK Anti-Money Laundering (AML) regulations require us to verify your identity and address.</p>
+                
+                <div className={styles.amlGrid}>
+                  <div className={styles.amlCard}>
+                    <h4>1. Photographic Proof of Identity</h4>
+                    <p>Please upload one of the following:</p>
+                    <ul className={styles.docList}>
+                      <li>Valid Passport</li>
+                      <li>Valid UK Photo Driving Licence</li>
+                      <li>Valid National Identity Card</li>
+                    </ul>
+                    <div className={styles.uploadBox}>
+                      {profile.idProof ? (
+                         <div className={styles.docCheck}>✅ Document Uploaded</div>
+                      ) : (
+                         <div className={styles.docPending}>⏳ Pendng Upload</div>
+                      )}
+                      <label className={styles.docLink}>
+                        {isSaving ? 'Uploading...' : 'Upload Photographic ID'}
+                        <input type="file" hidden onChange={(e) => handleDocumentUpload(e, 'idProof')} />
+                      </label>
+                    </div>
                   </div>
-                  <div className={styles.formGroup}>
-                    <label>Account Status</label>
-                    <input type="text" value={profile.status} disabled />
+
+                  <div className={styles.amlCard}>
+                    <h4>2. Proof of Residential Address</h4>
+                    <p>Please upload one of the following (dated within last 3 months):</p>
+                    <ul className={styles.docList}>
+                      <li>Utility Bill (Gas, Water, Electric)</li>
+                      <li>Council Tax Bill</li>
+                      <li>Bank / Building Society Statement</li>
+                      <li>HMRC Tax Notification</li>
+                    </ul>
+                    <div className={styles.uploadBox}>
+                      {profile.addressProof ? (
+                         <div className={styles.docCheck}>✅ Document Uploaded</div>
+                      ) : (
+                         <div className={styles.docPending}>⏳ Pending Upload</div>
+                      )}
+                      <label className={styles.docLink}>
+                        {isSaving ? 'Uploading...' : 'Upload Proof of Address'}
+                        <input type="file" hidden onChange={(e) => handleDocumentUpload(e, 'addressProof')} />
+                      </label>
+                    </div>
                   </div>
-                  <div className={styles.formGroup}>
-                    <label>Assigned Branch</label>
-                    <input type="text" value={profile.branch} disabled />
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label>Last Login</label>
-                    <input type="text" value={new Date().toLocaleDateString('en-GB')} disabled />
-                  </div>
-                </form>
+                </div>
+                
+                <div className={styles.complianceNote}>
+                  <h5>⚠️ Acceptable Documentation Guidance</h5>
+                  <p>All documents must be clear, readable, and showing all four corners. We cannot accept mobile phone bills or insurance documents as proof of address. If you are buying through a company, additional documentation for the company and all beneficial owners will be required.</p>
+                </div>
               </div>
             )}
           </div>
