@@ -37,7 +37,19 @@
 .subtitle {
   font-size: 1.05rem;
   color: var(--color-text-muted);
-  margin-bottom: 3.5rem;
+  margin-bottom: 2rem;
+}
+
+.errorBanner {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 2rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border: 1px solid #fecaca;
+  text-align: center;
 }
 
 .loginForm {

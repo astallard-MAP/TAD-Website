@@ -45,13 +45,32 @@ export default function PropertyDetails({ params }: { params: { id: string } }) 
     },
     partB: {
       constructionType: "Brick & Tile (Standard)",
-      utilitySources: "Mains Gas, Electricity, Water & Drainage",
-      connectivity: "Ultrafast Broadband available (1000Mbps)",
-      parking: "On-street & Off-road drive for 2 cars"
+      utilities: {
+        electricity: "Mains Electricity",
+        water: "Mains Water",
+        sewerage: "Mains Drainage",
+        heating: "Gas Central Heating"
+      },
+      connectivity: {
+        broadband: "Ultrafast (1000Mbps)",
+        mobile: "Excellent (4G/5G)"
+      },
+      parking: {
+        type: "On-street & Off-road drive",
+        spaces: 2
+      }
     },
     partC: {
-      specificIssues: "None known; Situated in a Conservation Area.",
-      rightsRisks: "Very Low flood risk from rivers and sea; Low surface water risk."
+      safety: {
+        buildingSafety: "No known issues (No cladding)",
+        listedStatus: "Not Listed",
+        conservationArea: "Situated in a Conservation Area"
+      },
+      restrictions: {
+        publicRightsOfWay: "None",
+        floodRisk: "Very Low flood risk",
+        coastalErosionRisk: "No risk identified"
+      }
     },
     
     pricing: {
@@ -93,7 +112,7 @@ export default function PropertyDetails({ params }: { params: { id: string } }) 
           </div>
           <div className={styles.thumbnails}>
              {property.images.map((img, i) => (
-               <img key={i} src={img} alt={`${property.headline} thumbnail ${i}`} className={styles.thumb} />
+                <img key={i} src={img} alt={`${property.headline} thumbnail ${i}`} className={styles.thumb} />
              ))}
           </div>
 
@@ -127,17 +146,26 @@ export default function PropertyDetails({ params }: { params: { id: string } }) 
                    <h5>Finance & Tax (Part A)</h5>
                    <p><strong>Council Tax:</strong> {property.partA.councilTaxBand}</p>
                    <p><strong>Qualifier:</strong> {property.partA.priceQualifier}</p>
+                   {property.tenure === 'Leasehold' && property.partA.leaseholdDetails && (
+                      <div className={styles.subDetail}>
+                         <p><strong>Lease:</strong> {property.partA.leaseholdDetails.yearsRemaining} years remaining</p>
+                         <p><strong>Ground Rent:</strong> £{property.partA.leaseholdDetails.annualGroundRent} p/a</p>
+                         <p><strong>Service Charge:</strong> £{property.partA.leaseholdDetails.annualServiceCharge} p/a</p>
+                      </div>
+                   )}
                 </div>
                 <div className={styles.complianceItem}>
                    <h5>Utilities & Physical (Part B)</h5>
                    <p><strong>Construction:</strong> {property.partB.constructionType}</p>
-                   <p><strong>Utilities:</strong> {property.partB.utilitySources}</p>
-                   <p><strong>Parking:</strong> {property.partB.parking}</p>
+                   <p><strong>Utilities:</strong> {property.partB.utilities.electricity}, {property.partB.utilities.water}, {property.partB.utilities.heating}</p>
+                   <p><strong>Connectivity:</strong> {property.partB.connectivity.broadband}</p>
+                   <p><strong>Parking:</strong> {property.partB.parking.type} ({property.partB.parking.spaces} spaces)</p>
                 </div>
                 <div className={styles.complianceItem}>
                    <h5>Safety & Risks (Part C)</h5>
-                   <p><strong>Specific Issues:</strong> {property.partC.specificIssues}</p>
-                   <p><strong>Flood Risk:</strong> {property.partC.rightsRisks}</p>
+                   <p><strong>Safety:</strong> {property.partC.safety.buildingSafety}</p>
+                   <p><strong>Listed Status:</strong> {property.partC.safety.listedStatus}</p>
+                   <p><strong>Flood Risk:</strong> {property.partC.restrictions.floodRisk}</p>
                 </div>
              </div>
           </section>

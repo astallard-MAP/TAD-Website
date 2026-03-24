@@ -61,21 +61,40 @@ export interface Property {
     councilTaxBand: string; // A-H or "Business Rates"
     leaseholdDetails?: {
       yearsRemaining: number;
-      groundRent: number;
-      serviceCharge: number;
+      annualGroundRent: number;
+      annualServiceCharge: number;
     };
   };
 
   partB: {
-    constructionType: string;
-    utilitySources: string;
-    connectivity: string;
-    parking: string;
+    constructionType: string; // Standard or Non-Standard
+    utilities: {
+      electricity: string;
+      water: string;
+      sewerage: string;
+      heating: string;
+    };
+    connectivity: {
+      broadband: string; // speed
+      mobile: string; // signal strength
+    };
+    parking: {
+      type: string; // e.g. Garage, Off-road
+      spaces: number;
+    };
   };
 
   partC: {
-    specificIssues: string; // Building safety/Conservation
-    rightsRisks: string; // Flood risk/Public rights of way
+    safety: {
+      buildingSafety: string; // cladding/asbestos
+      listedStatus: string;
+      conservationArea: string;
+    };
+    restrictions: {
+      publicRightsOfWay: string;
+      floodRisk: string; // surface/river
+      coastalErosionRisk: string;
+    };
   };
 
   // 4. Financial Fields

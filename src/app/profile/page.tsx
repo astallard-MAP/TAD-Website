@@ -1,39 +1,120 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from './profile.module.css';
-
+import { auth, db } from '@/lib/firebase';
+import { onAuthStateChanged, signOut, updateProfile as updateAuthProfile } from 'firebase/auth';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { UserProfile } from '@/lib/types';
 
-type Tab = 'DASHBOARD' | 'PROFILE' | 'REQUIREMENTS' | 'SAVED' | 'BIDS' | 'SETTINGS';
+type Tab = 'DASHBOARD' | 'PROFILE' | 'REQUIREMENTS' | 'SAVED' | 'BIDS' | 'SETTINGS' | 'ADMIN_CONSOLE';
 
 export default function ProfilePage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<Tab>('DASHBOARD');
   const [profileSubTab, setProfileSubTab] = useState<'IDENTITY' | 'CONTACT' | 'SECURITY'>('IDENTITY');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   
-  // Mock User Data (Mirrored from UserProfile interface)
+  // Real User Data from Firestore
   const [profile, setProfile] = useState<Partial<UserProfile & { role: string; status: string; branch: string }>>({
-    uid: 'user-123',
-    title: 'Mr',
-    firstName: 'Andrew',
-    surname: 'Stallard',
-    displayName: 'Andrew Stallard',
-    email: 'info@auctiondepartment.com',
-    workEmail: 'info@auctiondepartment.com',
-    homeEmail: '',
-    mobile: '0203 174 0330',
-    telephone: '0203 174 0331',
-    addressLine1: 'Hillsboro’, 377 Southchurch Road',
-    addressLine2: '',
-    townCity: 'Southend on Sea',
-    county: 'Essex',
-    postcode: 'SS1 2PQ',
-    country: 'United Kingdom',
-    role: 'Primary Member / Admin',
+    uid: '',
+    firstName: '',
+    surname: '',
+    displayName: '',
+    email: '',
+    mobile: '',
+    role: 'Member',
     status: 'Active',
-    branch: 'Southend Head Office'
+    branch: 'Main'
   });
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // Fetch Firestore data
+        try {
+          const docRef = doc(db, "users", user.uid);
+          const docSnap = await getDoc(docRef);
+          
+          if (docSnap.exists()) {
+            setProfile(docSnap.data() as any);
+          } else {
+            // Fallback to auth data if no firestore doc exists yet
+            setProfile({
+              uid: user.uid,
+              displayName: user.displayName || '',
+              email: user.email || '',
+              firstName: user.displayName?.split(' ')[0] || '',
+              surname: user.displayName?.split(' ').slice(1).join(' ') || '',
+              role: 'Member',
+              status: 'Active'
+            });
+          }
+        } catch (error) {
+          console.error("Error fetching profile:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        router.push('/login');
+      }
+    });
+
+    return () => unsubscribe();
+  }, [router]);
+
+  const handleUpdateIdentity = async () => {
+    if (!auth.currentUser) return;
+    setIsSaving(true);
+    try {
+      // 1. Update Auth
+      await updateAuthProfile(auth.currentUser, { displayName: profile.displayName });
+      
+      // 2. Update Firestore
+      const docRef = doc(db, "users", auth.currentUser.uid);
+      await updateDoc(docRef, {
+        firstName: profile.firstName,
+        surname: profile.surname,
+        displayName: profile.displayName,
+        workEmail: profile.workEmail || '',
+        homeEmail: profile.homeEmail || '',
+        title: profile.title || ''
+      });
+      alert('Identity details updated successfully!');
+    } catch (error) {
+      console.error("Update identity failed:", error);
+      alert('Failed to update identity details.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleUpdateContact = async () => {
+    if (!auth.currentUser) return;
+    setIsSaving(true);
+    try {
+      const docRef = doc(db, "users", auth.currentUser.uid);
+      await updateDoc(docRef, {
+        mobile: profile.mobile || '',
+        telephone: profile.telephone || '',
+        addressLine1: profile.addressLine1 || '',
+        addressLine2: profile.addressLine2 || '',
+        townCity: profile.townCity || '',
+        county: profile.county || '',
+        postcode: profile.postcode || '',
+        country: profile.country || 'United Kingdom'
+      });
+      alert('Contact information updated successfully!');
+    } catch (error) {
+      console.error("Update contact failed:", error);
+      alert('Failed to update contact information.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const [requirements, setRequirements] = useState({
     propertyType: 'Residential',
@@ -60,6 +141,10 @@ export default function ProfilePage() {
        status: "Closing Soon"
     }
   ];
+
+  if (isLoading) {
+    return <div className={styles.loadingState}>Loading your dashboard...</div>;
+  }
 
   const renderContent = () => {
     switch (activeTab) {
@@ -170,7 +255,7 @@ export default function ProfilePage() {
                     <input 
                       type="text" 
                       value={profile.firstName} 
-                      onChange={(e) => setProfile({...profile, firstName: e.target.value, displayName: `${e.target.value} ${profile.surname}`})}
+                      onChange={(e) => setProfile({...profile, firstName: e.target.value})}
                     />
                   </div>
                   <div className={styles.formGroup}>
@@ -178,7 +263,7 @@ export default function ProfilePage() {
                     <input 
                       type="text" 
                       value={profile.surname} 
-                      onChange={(e) => setProfile({...profile, surname: e.target.value, displayName: `${profile.firstName} ${e.target.value}`})}
+                      onChange={(e) => setProfile({...profile, surname: e.target.value})}
                     />
                   </div>
                   <div className={styles.formGroup}>
@@ -206,7 +291,14 @@ export default function ProfilePage() {
                     />
                   </div>
                   <div className={styles.fullWidth}>
-                    <button type="button" className={styles.saveBtn}>Update Identity Details</button>
+                    <button 
+                      type="button" 
+                      className={styles.saveBtn} 
+                      onClick={handleUpdateIdentity}
+                      disabled={isSaving}
+                    >
+                      {isSaving ? 'Updating...' : 'Update Identity Details'}
+                    </button>
                   </div>
                 </form>
               </div>
@@ -281,7 +373,14 @@ export default function ProfilePage() {
                     />
                   </div>
                   <div className={styles.fullWidth}>
-                    <button type="button" className={styles.saveBtn}>Update Contact Info</button>
+                    <button 
+                      type="button" 
+                      className={styles.saveBtn} 
+                      onClick={handleUpdateContact}
+                      disabled={isSaving}
+                    >
+                      {isSaving ? 'Updating...' : 'Update Contact Info'}
+                    </button>
                   </div>
                 </form>
               </div>
@@ -327,16 +426,13 @@ export default function ProfilePage() {
 
             <div className={styles.section}>
               <form className={styles.formGrid}>
+                {/* Simplified requirements form */}
                 <div className={styles.formGroup}>
                   <label>Property Interest</label>
-                  <select 
-                    value={requirements.propertyType}
-                    onChange={(e) => setRequirements({...requirements, propertyType: e.target.value})}
-                  >
+                  <select value={requirements.propertyType} onChange={(e) => setRequirements({...requirements, propertyType: e.target.value})}>
                     <option>Residential</option>
                     <option>Commercial</option>
                     <option>Land / Development</option>
-                    <option>Mixed Use</option>
                   </select>
                 </div>
                 <div className={styles.formGroup}>
@@ -404,12 +500,46 @@ export default function ProfilePage() {
           </div>
         );
 
+      case 'ADMIN_CONSOLE':
+        return (
+          <div className={styles.dashboard}>
+            <header className={styles.dashHeader}>
+              <h1>Admin Command Center</h1>
+              <p>Hello Andrew, you have full access to the project's features and data.</p>
+            </header>
+
+            <div className={styles.statsGrid}>
+               <div className={styles.statBox}>
+                  <h4>Total Users</h4>
+                  <span className={styles.statNum}>1,248</span>
+               </div>
+               <div className={styles.statBox}>
+                  <h4>Global Revenue</h4>
+                  <span className={styles.statNum}>£1.5M</span>
+               </div>
+               <div className={styles.statBox}>
+                  <h4>System Health</h4>
+                  <span className={styles.statNum} style={{color: '#4caf50'}}>100%</span>
+               </div>
+            </div>
+
+            <section className={styles.section}>
+               <h2>Admin Tools</h2>
+               <div className={styles.actionGrid}>
+                  <button className="btn btn-primary">Manage Properties</button>
+                  <button className="btn btn-secondary">Review Bids</button>
+                  <button className="btn btn-secondary">Security Log</button>
+               </div>
+            </section>
+          </div>
+        );
+
       default:
         return (
           <div className={styles.dashboard}>
             <header className={styles.dashHeader}>
-              <h1>Working on it...</h1>
-              <p>This section is being synchronized with our auction servers. Please check back shortly.</p>
+              <h1>Section Under Construction</h1>
+              <p>We are currently synchronizing this module with the auction servers.</p>
             </header>
           </div>
         );
@@ -423,11 +553,11 @@ export default function ProfilePage() {
         <aside className={styles.sidebar}>
           <div className={styles.userHead}>
             <div className={styles.avatar}>
-               {(profile.firstName || 'A')[0]}{(profile.surname || 'S')[0]}
+               {(profile.firstName || 'U')[0]}{(profile.surname || 'P')[0]}
             </div>
             <div className={styles.userName}>
               <h3>{profile.firstName} {profile.surname}</h3>
-              <span>Member ID: TAD-{(profile.postcode || '').replace(' ', '')}</span>
+              <span>ID: {profile.uid ? profile.uid.substring(0, 8) : 'Pending'}</span>
             </div>
           </div>
           
@@ -451,17 +581,16 @@ export default function ProfilePage() {
               <span className={styles.sideIcon}>🎯</span> Requirements
             </div>
             <div 
-              className={`${styles.sideLink} ${activeTab === 'BIDS' ? styles.active : ''}`}
-              onClick={() => setActiveTab('BIDS')}
-            >
-              <span className={styles.sideIcon}>🔨</span> My Active Bids <span className={styles.count}>2</span>
-            </div>
-            <div 
               className={`${styles.sideLink} ${activeTab === 'SAVED' ? styles.active : ''}`}
               onClick={() => setActiveTab('SAVED')}
             >
               <span className={styles.sideIcon}>❤️</span> Saved Items
             </div>
+            {profile.role === 'Global Administrator' && (
+               <div className={`${styles.sideLink} ${activeTab === 'ADMIN_CONSOLE' ? styles.active : ''}`} onClick={() => setActiveTab('ADMIN_CONSOLE')}>
+                 <span className={styles.sideIcon}>🛡️</span> Admin Console
+               </div>
+            )}
             <div 
               className={`${styles.sideLink} ${activeTab === 'SETTINGS' ? styles.active : ''}`}
               onClick={() => setActiveTab('SETTINGS')}
@@ -470,7 +599,7 @@ export default function ProfilePage() {
             </div>
           </nav>
           
-          <button className={styles.logoutBtn}>Sign Out</button>
+          <button className={styles.logoutBtn} onClick={() => signOut(auth).then(() => router.push('/'))}>Sign Out</button>
         </aside>
 
         {/* Dynamic Main Content */}
@@ -481,4 +610,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-
