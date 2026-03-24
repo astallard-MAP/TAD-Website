@@ -28,8 +28,8 @@ export default function AboutPage() {
         <div className={styles.mascotText}>
            <h2>Meet Frank Tadsworth-Bids</h2>
            <span className={styles.mascotRole}>Brand Ambassador & Chief Auctioneer</span>
-           <p>Frank isn't just our mascot; he's the embodiment of our "look before you leap" philosophy. Wearing his signature purple suit and always carrying his trusted gavel, Frank represents the transparency, speed, and character of The Auction Department.</p>
-           <p>You'll find Frank across our platform, helping you navigate the auction process and ensuring every bid is a fair one. He brings a touch of personality to the serious business of property auctions.</p>
+           <p>Frank isn&apos;t just our mascot; he&apos;s the embodiment of our &quot;look before you leap&quot; philosophy. Wearing his signature purple suit and always carrying his trusted gavel, Frank represents the transparency, speed, and character of The Auction Department.</p>
+           <p>You&apos;ll find Frank across our platform, helping you navigate the auction process and ensuring every bid is a fair one. He brings a touch of personality to the serious business of property auctions.</p>
         </div>
         <div className={styles.mascotImg}>
            <img src="/images/FTB.png" alt="Frank Tadsworth-Bids in his purple suit" />

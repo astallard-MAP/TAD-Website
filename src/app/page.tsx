@@ -9,7 +9,7 @@ export default function Home() {
         <div className={styles.heroContent}>
           <h1>Land & Property Auctions Redefined.</h1>
           <p>
-            Experience the UK's most professional and transparent auction platform. 
+            Experience the UK&apos;s most professional and transparent auction platform. 
             Whether you are expanding your portfolio or seeking an immediate sale, 
             we provide the expertise you need.
           </p>

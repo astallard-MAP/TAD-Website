@@ -58,13 +58,13 @@ export default function Properties() {
           <div className={styles.filterGroup}>
             <h3>Filter Results</h3>
             <div className={styles.searchBox}>
-              <input type="text" placeholder="Search by location or postcode..." />
+              <input type="text" placeholder="Search by location or postcode..." className={styles.input} />
             </div>
           </div>
 
           <div className={styles.filterGroup}>
             <label>Property Type</label>
-            <select>
+            <select className={styles.select}>
               <option>All Types</option>
               <option>Residential</option>
               <option>Commercial</option>
@@ -75,8 +75,8 @@ export default function Properties() {
           <div className={styles.filterGroup}>
             <label>Price Range</label>
             <div className={styles.range}>
-              <select><option>Min Price</option></select>
-              <select><option>Max Price</option></select>
+              <select className={styles.select}><option>Min Price</option></select>
+              <select className={styles.select}><option>Max Price</option></select>
             </div>
           </div>
 

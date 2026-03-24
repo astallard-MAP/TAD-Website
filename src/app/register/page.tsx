@@ -32,7 +32,7 @@ export default function RegisterPage() {
         </form>
 
         <div className={styles.footerLinks}>
-          <span>Already have an account?</span>
+          <span>Don&apos;t have an account?</span>
           <Link href="/login" className={styles.loginLink}>Log In</Link>
         </div>
       </div>

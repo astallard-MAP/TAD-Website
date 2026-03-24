@@ -27,7 +27,7 @@ export default function LoginPage() {
         </form>
 
         <div className={styles.footerLinks}>
-          <span>Don't have an account?</span>
+          <span>Don&apos;t have an account?</span>
           <Link href="/register" className={styles.registerLink}>Register for Free</Link>
         </div>
       </div>

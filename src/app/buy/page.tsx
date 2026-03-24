@@ -5,7 +5,7 @@ export default function BuyPage() {
   return (
     <div className={`container ${styles.page}`}>
       <div className={styles.hero}>
-        <h1>The Buyer's Journey</h1>
+        <h1>The Buyer&apos;s Journey</h1>
         <p>A comprehensive guide to buying land and property through The Auction Department. Experience the clarity and speed of auction transactions.</p>
         <Link href="/properties" className={`btn btn-primary ${styles.cta}`}>Browse Current Lots</Link>
       </div>
@@ -24,7 +24,7 @@ export default function BuyPage() {
         <div className={`${styles.step} ${styles.reverse}`}>
           <div className={styles.stepContent}>
             <h2>2. Review the Legal Pack</h2>
-            <p>Every property has a dedicated legal pack. It's crucial to review this with your solicitor before the auction. This contains all titles, searches, and special conditions of sale.</p>
+            <p>Every property has a dedicated legal pack. It&apos;s crucial to review this with your solicitor before the auction. This contains all titles, searches, and special conditions of sale.</p>
           </div>
           <div className={styles.stepImage}>
             <img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=800" alt="Legal documents" />
@@ -61,7 +61,7 @@ export default function BuyPage() {
           </div>
           <div className={styles.faqItem}>
             <h3>What is a Guide Price?</h3>
-            <p>The guide price is an indication of the seller's minimum expectation. It is not necessarily the price the property will sell for.</p>
+            <p>The guide price is an indication of the seller&apos;s minimum expectation. It is not necessarily the price the property will sell for.</p>
           </div>
           <div className={styles.faqItem}>
             <h3>What is a Reserve Price?</h3>
