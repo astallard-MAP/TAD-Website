@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # The Auction Department (TAD) Website 🐸
 
 A state-of-the-art marketing platform and member portal for the UK Land and Property Auction sector.
@@ -44,3 +45,7 @@ Meet Frank, our Chief AI Auctioneer. Frank is a common frog in a sharp purple su
 - **VAT**: GB 186 8746 44
 - **Offices**: Southend-on-Sea & Leigh-on-Sea, Essex.
 - **Contact**: 0203 174 0330 | info@auctiondepartment.com
+=======
+# TAD-Website
+Th Auction Department Website
+>>>>>>> aa57f3d63aca4e3a8c836bedf7552762326eba08
