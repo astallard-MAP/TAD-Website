@@ -1,0 +1,82 @@
+.header {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  background-color: var(--color-bg-white);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: var(--shadow-subtle);
+}
+
+.headerInner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logoImg {
+  height: 45px;
+  width: auto;
+}
+
+.nav {
+  display: flex;
+}
+
+.navList {
+  display: flex;
+  gap: 2rem;
+}
+
+.navLink {
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: var(--color-text-main);
+  position: relative;
+  padding: 0.5rem 0;
+}
+
+.navLink:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--color-primary);
+  transition: var(--transition-smooth);
+}
+
+.navLink:hover:after {
+  width: 100%;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.loginBtn {
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--color-text-main);
+}
+
+.ctaBtn {
+  padding: 0.6rem 1.4rem;
+}
+
+@media (max-width: 992px) {
+  .nav {
+    display: none;
+  }
+}

@@ -1,0 +1,105 @@
+.page {
+  min-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg-light);
+  padding: 2rem;
+}
+
+.loginCard {
+  width: 100%;
+  max-width: 480px;
+  background: white;
+  padding: 4rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-medium);
+  text-align: center;
+}
+
+.logo {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.2rem;
+  margin-bottom: 2.5rem;
+}
+
+.accent {
+  color: var(--color-primary);
+}
+
+.loginCard h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 1.05rem;
+  color: var(--color-text-muted);
+  margin-bottom: 3.5rem;
+}
+
+.loginForm {
+  text-align: left;
+  margin-bottom: 3rem;
+}
+
+.inputGroup {
+  margin-bottom: 2rem;
+}
+
+.inputGroup label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+  text-transform: uppercase;
+  color: var(--color-text-main);
+}
+
+.inputGroup input {
+  width: 100%;
+  padding: 1rem 1.2rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: #f9f9f9;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.labelRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.forgotPass {
+  font-size: 0.85rem;
+  color: var(--color-primary);
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+}
+
+.submitBtn {
+  width: 100%;
+  padding: 1.2rem;
+  font-size: 1.1rem;
+}
+
+.footerLinks {
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+}
+
+.registerLink {
+  color: var(--color-primary);
+  font-weight: 700;
+  margin-left: 0.5rem;
+}
+
+@media (max-width: 576px) {
+  .loginCard {
+    padding: 3rem 2rem;
+  }
+}

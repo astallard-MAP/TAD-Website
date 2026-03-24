@@ -1,0 +1,157 @@
+.page {
+  padding: 4rem 0;
+  min-height: 80vh;
+}
+
+.header {
+  text-align: center;
+  max-width: 850px;
+  margin: 0 auto 5rem auto;
+}
+
+.header h1 {
+  font-size: 3.2rem;
+  margin-bottom: 1.5rem;
+}
+
+.header p {
+  font-size: 1.2rem;
+  color: var(--color-text-muted);
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 5rem;
+  align-items: flex-start;
+}
+
+.formContainer {
+  background: white;
+  padding: 4rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-subtle);
+}
+
+.valuationForm h2 {
+  font-size: 2rem;
+  margin-bottom: 2.5rem;
+  color: var(--color-brand-4);
+}
+
+.inputGroup {
+  margin-bottom: 2rem;
+}
+
+.inputGroup label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+  text-transform: uppercase;
+  color: var(--color-text-main);
+}
+
+.inputGroup input, 
+.inputGroup select, 
+.inputGroup textarea {
+  width: 100%;
+  padding: 1rem 1.2rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: #f9f9f9;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.inputGroup input:focus, 
+.inputGroup select:focus, 
+.inputGroup textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background-color: #fff;
+}
+
+.submitBtn {
+  width: 100%;
+  padding: 1.2rem;
+  font-size: 1.1rem;
+  margin-top: 1rem;
+}
+
+.infoAside {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.infoCard {
+  background: var(--color-bg-light);
+  padding: 3rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+}
+
+.infoCard h3 {
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.infoList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.infoList li {
+  font-size: 1.05rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+.infoList li strong {
+  color: var(--color-brand-4);
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.directContact {
+  background: var(--color-brand-4);
+  color: white;
+  padding: 3rem;
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+
+.directContact h3 {
+  font-size: 1.8rem;
+  margin-bottom: 1.2rem;
+}
+
+.directContact p {
+  opacity: 0.8;
+  margin-bottom: 2rem;
+}
+
+.phoneLink {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--color-secondary);
+  display: block;
+}
+
+.phoneLink:hover {
+  color: #fff;
+  transform: scale(1.05);
+}
+
+@media (max-width: 992px) {
+  .content {
+    grid-template-columns: 1fr;
+    gap: 4rem;
+  }
+  .formContainer {
+    padding: 2.5rem;
+  }
+}
