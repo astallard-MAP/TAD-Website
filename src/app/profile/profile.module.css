@@ -28,19 +28,55 @@
   margin-bottom: 3.5rem;
 }
 
+.avatarWrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
 .avatar {
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
   background: linear-gradient(45deg, var(--color-primary), var(--color-secondary));
   color: white;
-  border-radius: 30px;
+  border-radius: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 1.5rem auto;
-  font-size: 2.2rem;
+  font-size: 2.5rem;
   font-weight: 700;
   box-shadow: 0 15px 35px rgba(132, 97, 166, 0.25);
+  position: relative;
+  overflow: hidden;
+  transition: var(--transition-smooth);
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 40px;
+}
+
+.avatarEdit {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  cursor: pointer;
+  color: white;
+  font-size: 1.5rem;
+}
+
+.avatar:hover .avatarEdit {
+  opacity: 1;
 }
 
 .userName h3 {

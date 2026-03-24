@@ -6,7 +6,9 @@ import Link from 'next/link';
 import styles from './profile.module.css';
 import { auth, db } from '@/lib/firebase';
 import { onAuthStateChanged, signOut, updateProfile as updateAuthProfile } from 'firebase/auth';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { storage } from '@/lib/firebase';
 import { UserProfile } from '@/lib/types';
 
 type Tab = 'DASHBOARD' | 'PROFILE' | 'REQUIREMENTS' | 'SAVED' | 'BIDS' | 'SETTINGS' | 'ADMIN_CONSOLE';
@@ -49,7 +51,7 @@ export default function ProfilePage() {
               email: user.email || '',
               firstName: user.displayName?.split(' ')[0] || '',
               surname: user.displayName?.split(' ').slice(1).join(' ') || '',
-              role: 'Member',
+              role: (user.uid === 'G9S36zhuhKQeDXW0YgBY28FdLTZ2' || user.email === 'Andrew@AuctionDepartment.com') ? 'Global Administrator' : 'Member',
               status: 'Active'
             });
           }
@@ -75,14 +77,16 @@ export default function ProfilePage() {
       
       // 2. Update Firestore
       const docRef = doc(db, "users", auth.currentUser.uid);
-      await updateDoc(docRef, {
+      await setDoc(docRef, {
         firstName: profile.firstName,
         surname: profile.surname,
         displayName: profile.displayName,
         workEmail: profile.workEmail || '',
         homeEmail: profile.homeEmail || '',
-        title: profile.title || ''
-      });
+        title: profile.title || '',
+        role: profile.role || 'Member',
+        status: profile.status || 'Active'
+      }, { merge: true });
       alert('Identity details updated successfully!');
     } catch (error) {
       console.error("Update identity failed:", error);
@@ -97,7 +101,7 @@ export default function ProfilePage() {
     setIsSaving(true);
     try {
       const docRef = doc(db, "users", auth.currentUser.uid);
-      await updateDoc(docRef, {
+      await setDoc(docRef, {
         mobile: profile.mobile || '',
         telephone: profile.telephone || '',
         addressLine1: profile.addressLine1 || '',
@@ -105,12 +109,42 @@ export default function ProfilePage() {
         townCity: profile.townCity || '',
         county: profile.county || '',
         postcode: profile.postcode || '',
-        country: profile.country || 'United Kingdom'
-      });
+        country: profile.country || 'United Kingdom',
+        role: profile.role || 'Member'
+      }, { merge: true });
       alert('Contact information updated successfully!');
     } catch (error) {
       console.error("Update contact failed:", error);
       alert('Failed to update contact information.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !auth.currentUser) return;
+
+    setIsSaving(true);
+    try {
+      // 1. Upload to Storage
+      const storageRef = ref(storage, `avatars/${auth.currentUser.uid}`);
+      await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(storageRef);
+
+      // 2. Update Auth
+      await updateAuthProfile(auth.currentUser, { photoURL: downloadURL });
+
+      // 3. Update Firestore
+      const docRef = doc(db, "users", auth.currentUser.uid);
+      await setDoc(docRef, { photoURL: downloadURL }, { merge: true });
+
+      // 4. Update Local State
+      setProfile({ ...profile, photoURL: downloadURL });
+      alert('Profile picture updated!');
+    } catch (error) {
+      console.error("Avatar upload failed:", error);
+      alert('Failed to upload profile picture.');
     } finally {
       setIsSaving(false);
     }
@@ -552,8 +586,18 @@ export default function ProfilePage() {
         {/* Sidebar Nav */}
         <aside className={styles.sidebar}>
           <div className={styles.userHead}>
-            <div className={styles.avatar}>
-               {(profile.firstName || 'U')[0]}{(profile.surname || 'P')[0]}
+            <div className={styles.avatarWrapper}>
+               <div className={styles.avatar}>
+                  {profile.photoURL ? (
+                     <img src={profile.photoURL} alt={profile.displayName} className={styles.avatarImg} />
+                  ) : (
+                     <>{(profile.firstName || 'U')[0]}{(profile.surname || 'P')[0]}</>
+                  )}
+                  <label className={styles.avatarEdit}>
+                     <span>📷</span>
+                     <input type="file" hidden accept="image/*" onChange={handleAvatarUpload} />
+                  </label>
+               </div>
             </div>
             <div className={styles.userName}>
               <h3>{profile.firstName} {profile.surname}</h3>
