@@ -38,8 +38,6 @@
   gap: 6rem;
 }
 
-.detailsCol {
-}
 
 .mainImage {
   height: 600px;
@@ -309,4 +307,74 @@
   .mainImage {
     height: 400px;
   }
+}
+.addendumAlert {
+  background: #fff5f5;
+  border: 2px solid #ff4d4d;
+  padding: 2rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 3rem;
+  box-shadow: 0 4px 15px rgba(255, 77, 77, 0.1);
+}
+
+.addendumAlert h3 {
+  color: #d63031;
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.addendumAlert ul {
+  list-style: disc;
+  padding-left: 2rem;
+}
+
+.addendumAlert li {
+  font-size: 1.05rem;
+  color: #2d3436;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.headerBadgeRow {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.epcBadge {
+  display: inline-block;
+  padding: 0.35rem 1rem;
+  border-radius: 4px;
+  font-weight: 800;
+  font-size: 0.75rem;
+  color: white;
+  text-transform: uppercase;
+}
+
+.epcA { background-color: #008037; }
+.epcB { background-color: #1a9e4a; }
+.epcC { background-color: #8cc63f; }
+.epcD { background-color: #f6ec00; color: #333; }
+.epcE { background-color: #f7941e; }
+.epcF { background-color: #ef4123; }
+.epcG { background-color: #ed1c24; }
+.epcN { background-color: #636e72; }
+
+.legalFootnote {
+  margin-top: 8rem;
+  padding: 3rem;
+  background: var(--color-bg-light);
+  border-radius: var(--radius-lg);
+  border-top: 1px solid var(--color-border);
+}
+
+.legalFootnote p {
+  font-size: 0.85rem !important;
+  line-height: 1.8 !important;
+  color: var(--color-text-muted) !important;
+  text-align: justify;
 }

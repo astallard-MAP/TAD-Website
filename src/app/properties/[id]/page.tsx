@@ -3,7 +3,7 @@ import styles from './property.module.css';
 import { Property } from '@/lib/types';
 
 export default function PropertyDetails({ params }: { params: { id: string } }) {
-  // Mock detailed property data mirrored from reference project
+  // Mock detailed property data mirrored from reference project with 2026 Compliance
   const property: Property = {
     id: params.id,
     houseNameNumber: "377",
@@ -39,6 +39,13 @@ export default function PropertyDetails({ params }: { params: { id: string } }) 
     ],
 
     epcRating: 'C',
+    epcCertificateUrl: "#",
+    auctionType: 'Traditional',
+    addendums: [
+      "Completion date changed to 20th April 2026.",
+      "New structural report added to the legal pack on 23/03/2026."
+    ],
+
     partA: {
       priceQualifier: "Guide Price",
       councilTaxBand: "Band C"
@@ -74,6 +81,7 @@ export default function PropertyDetails({ params }: { params: { id: string } }) 
     },
     
     pricing: {
+      reservePrice: 425000,
       guidePrice: "£450,000"
     },
     feesCommission: {
@@ -95,13 +103,30 @@ export default function PropertyDetails({ params }: { params: { id: string } }) 
 
   return (
     <div className={`container ${styles.page}`}>
+      {/* Addendum Alert Box */}
+      {property.addendums && property.addendums.length > 0 && (
+        <div className={styles.addendumAlert}>
+          <h3>⚠️ Important Addendums</h3>
+          <ul>
+            {property.addendums.map((add, i) => (
+              <li key={i}>{add}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <div className={styles.header}>
-        <div className={styles.tag}>{property.type} - {property.tenure}</div>
+        <div className={styles.headerBadgeRow}>
+          <div className={styles.tag}>{property.type} - {property.tenure}</div>
+          <div className={`${styles.epcBadge} ${styles['epc' + property.epcRating]}`}>
+            EPC: {property.epcRating}
+          </div>
+        </div>
         <h1>{property.headline}</h1>
         <div className={styles.metaRow}>
           <span>📍 {property.addressLine1}, {property.townCity}</span>
-          <span>📅 Auction: {property.auctionDate}</span>
-          <span>🔋 EPC: {property.epcRating}</span>
+          <span>📅 Auction Method: {property.auctionType}</span>
+          <span>⏰ Auction Date: {property.auctionDate}</span>
         </div>
       </div>
 
@@ -140,12 +165,12 @@ export default function PropertyDetails({ params }: { params: { id: string } }) 
           </section>
 
           <section className={styles.section}>
-             <h2>Material Information</h2>
+             <h2>Material Information (UK Compliance)</h2>
              <div className={styles.complianceGrid}>
                 <div className={styles.complianceItem}>
                    <h5>Finance & Tax (Part A)</h5>
                    <p><strong>Council Tax:</strong> {property.partA.councilTaxBand}</p>
-                   <p><strong>Qualifier:</strong> {property.partA.priceQualifier}</p>
+                   <p><strong>Pricing:</strong> {property.partA.priceQualifier}</p>
                    {property.tenure === 'Leasehold' && property.partA.leaseholdDetails && (
                       <div className={styles.subDetail}>
                          <p><strong>Lease:</strong> {property.partA.leaseholdDetails.yearsRemaining} years remaining</p>
@@ -158,14 +183,13 @@ export default function PropertyDetails({ params }: { params: { id: string } }) 
                    <h5>Utilities & Physical (Part B)</h5>
                    <p><strong>Construction:</strong> {property.partB.constructionType}</p>
                    <p><strong>Utilities:</strong> {property.partB.utilities.electricity}, {property.partB.utilities.water}, {property.partB.utilities.heating}</p>
-                   <p><strong>Connectivity:</strong> {property.partB.connectivity.broadband}</p>
-                   <p><strong>Parking:</strong> {property.partB.parking.type} ({property.partB.parking.spaces} spaces)</p>
+                   <p><strong>EPC Rating:</strong> {property.epcRating} {property.epcCertificateUrl && <a href={property.epcCertificateUrl} target="_blank">(View Certificate)</a>}</p>
                 </div>
                 <div className={styles.complianceItem}>
                    <h5>Safety & Risks (Part C)</h5>
                    <p><strong>Safety:</strong> {property.partC.safety.buildingSafety}</p>
                    <p><strong>Listed Status:</strong> {property.partC.safety.listedStatus}</p>
-                   <p><strong>Flood Risk:</strong> {property.partC.restrictions.floodRisk}</p>
+                   <p><strong>Conservation:</strong> {property.partC.safety.conservationArea}</p>
                 </div>
              </div>
           </section>
@@ -191,22 +215,25 @@ export default function PropertyDetails({ params }: { params: { id: string } }) 
              <ul className={styles.featureList}>
                 <li><strong>Admin Fee:</strong> £{property.feesCommission.buyerFees.adminFee}</li>
                 <li><strong>Buyer Premium:</strong> {property.feesCommission.buyerFees.buyerPremium}</li>
-                <li><strong>Tenure:</strong> {property.tenure}</li>
+                <li><strong>Legal Pack:</strong> Available to download</li>
              </ul>
-             <Link href="/register" className={styles.actionBtn}>
+             <a href={property.legalPackUrl} className={styles.actionBtn}>
                 <span>📄</span>
                 <span>Download Legal Pack</span>
-             </Link>
+             </a>
           </div>
 
           <div className={styles.contactExpert}>
-             <h3>Expert Assistance</h3>
-             <p>Have questions about Part B or C compliance?</p>
+             <h3>Compliance Questions?</h3>
+             <p>Our experts can clarify Part A, B, or C material information.</p>
              <a href="tel:02031740330" className={styles.phoneLink}>0203 174 0330</a>
           </div>
         </aside>
       </div>
+
+      <footer className={styles.legalFootnote}>
+        <p><strong>Important Notice:</strong> This property is offered for sale by {property.auctionType === 'Traditional' ? 'Traditional Auction' : 'the Modern Method of Auction'}. <strong>Guide Price:</strong> An indication of the seller’s current minimum acceptable price at auction. The guide price or range of guide prices is given to assist consumers in deciding whether or not to pursue a purchase. It is usual, but not always the case, that a provisional reserve range is agreed between the seller and the auctioneer at the start of marketing. <strong>Reserve Price:</strong> The seller’s minimum acceptable price at auction and the figure below which the auctioneer cannot sell. The reserve price is not disclosed and remains confidential between the seller and the auctioneer. Both the guide price and the reserve price can be subject to change up to and including the day of the auction.</p>
+      </footer>
     </div>
   );
 }
-

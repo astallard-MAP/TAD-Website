@@ -16,6 +16,7 @@ export interface UserProfile {
   homeEmail?: string;
   telephone?: string;
   mobile?: string;
+  primaryEmail?: 'HOME' | 'WORK';
 
   // Address
   addressLine1?: string;
@@ -24,6 +25,11 @@ export interface UserProfile {
   county?: string;
   postcode?: string;
   country?: string;
+
+  // KYC/AML
+  idProof?: string;
+  addressProof?: string;
+  role?: string;
 }
 
 export interface Property {
@@ -52,13 +58,15 @@ export interface Property {
   viewingArrangements: string;
   accommodationSchedule: FloorPlan[];
 
-  // 3. Material Information (2026 Compliance)
+  // 3. Material Information & Compliance
   epcRating: 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'N/A';
-  epcCertificateUrl?: string; // PDF
+  epcCertificateUrl?: string; 
+  auctionType: 'Traditional' | 'Modern Method';
+  addendums?: string[]; // Last minute changes
   
   partA: {
-    priceQualifier: string; // e.g., "Guide Price", "Offers Over"
-    councilTaxBand: string; // A-H or "Business Rates"
+    priceQualifier: string; 
+    councilTaxBand: string; 
     leaseholdDetails?: {
       yearsRemaining: number;
       annualGroundRent: number;
@@ -67,7 +75,7 @@ export interface Property {
   };
 
   partB: {
-    constructionType: string; // Standard or Non-Standard
+    constructionType: string;
     utilities: {
       electricity: string;
       water: string;
@@ -75,24 +83,24 @@ export interface Property {
       heating: string;
     };
     connectivity: {
-      broadband: string; // speed
-      mobile: string; // signal strength
+      broadband: string;
+      mobile: string;
     };
     parking: {
-      type: string; // e.g. Garage, Off-road
+      type: string;
       spaces: number;
     };
   };
 
   partC: {
     safety: {
-      buildingSafety: string; // cladding/asbestos
+      buildingSafety: string;
       listedStatus: string;
       conservationArea: string;
     };
     restrictions: {
       publicRightsOfWay: string;
-      floodRisk: string; // surface/river
+      floodRisk: string;
       coastalErosionRisk: string;
     };
   };
@@ -100,7 +108,7 @@ export interface Property {
   // 4. Financial Fields
   pricing: {
     reservePrice?: number; // Secret minimum
-    guidePrice: string; // e.g. "£450,000" or "£450k - £500k"
+    guidePrice: string; 
   };
 
   feesCommission: {
@@ -111,7 +119,7 @@ export interface Property {
     };
     buyerFees: {
       adminFee: number;
-      buyerPremium: string; // Fixed or %
+      buyerPremium: string; 
     };
   };
 
@@ -129,7 +137,7 @@ export interface FloorPlan {
 export interface Room {
   name: string;
   dimensions: {
-    imperial: string; // e.g. 12'4" x 10'5"
-    metric: string; // e.g. 3.75m x 3.18m
+    imperial: string; 
+    metric: string; 
   };
 }
