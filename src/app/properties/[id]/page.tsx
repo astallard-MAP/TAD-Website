@@ -1,97 +1,179 @@
 import Link from 'next/link';
 import styles from './property.module.css';
+import { Property } from '@/lib/types';
 
 export default function PropertyDetails({ params }: { params: { id: string } }) {
-  // Mock property data
-  const property = {
+  // Mock detailed property data mirrored from reference project
+  const property: Property = {
     id: params.id,
-    title: "Southchurch Road, Southend-On-Sea, SS1 2PQ",
-    guidePrice: "£450,000",
-    tag: "Residential Auction",
-    description: "A fantastic opportunity to acquire this spacious three-bedroom residential property in the heart of Southend-On-Sea. The property offers excellent development potential and is within walking distance of local amenities and transport links.",
-    features: ["3 Spacious Bedrooms", "2 Modern Bathrooms", "Freehold Interest", "Large Rear Garden", "Development Potential"],
+    houseNameNumber: "377",
+    addressLine1: "Southchurch Road",
+    townCity: "Southend-On-Sea",
+    county: "Essex",
+    postcode: "SS1 2PQ",
+    
+    headline: "STUNNING 3-BED RESIDENTIAL INVESTMENT OPPORTUNITY",
+    subheading: "A spacious freehold house with significant development potential and modern interiors.",
+    type: 'House',
+    tenure: 'Freehold',
+    tenancyStatus: 'Vacant',
+    locationIntel: "Ideally located within walking distance of Southend East station and the vibrant Southchurch village shops.",
+    viewingArrangements: "Strictly by appointment via The Auction Department.",
+
+    accommodationSchedule: [
+      {
+        floorName: "Ground Floor",
+        rooms: [
+          { name: "Lounge", dimensions: { imperial: "14'2\" x 12'5\"", metric: "4.32m x 3.78m" } },
+          { name: "Kitchen / Diner", dimensions: { imperial: "18'5\" x 11'2\"", metric: "5.61m x 3.40m" } }
+        ]
+      },
+      {
+        floorName: "First Floor",
+        rooms: [
+          { name: "Bedroom 1", dimensions: { imperial: "12'8\" x 11'4\"", metric: "3.86m x 3.45m" } },
+          { name: "Bedroom 2", dimensions: { imperial: "11'6\" x 9'8\"", metric: "3.51m x 2.95m" } },
+          { name: "Bedroom 3", dimensions: { imperial: "8'2\" x 7'5\"", metric: "2.49m x 2.26m" } }
+        ]
+      }
+    ],
+
+    epcRating: 'C',
+    partA: {
+      priceQualifier: "Guide Price",
+      councilTaxBand: "Band C"
+    },
+    partB: {
+      constructionType: "Brick & Tile (Standard)",
+      utilitySources: "Mains Gas, Electricity, Water & Drainage",
+      connectivity: "Ultrafast Broadband available (1000Mbps)",
+      parking: "On-street & Off-road drive for 2 cars"
+    },
+    partC: {
+      specificIssues: "None known; Situated in a Conservation Area.",
+      rightsRisks: "Very Low flood risk from rivers and sea; Low surface water risk."
+    },
+    
+    pricing: {
+      guidePrice: "£450,000"
+    },
+    feesCommission: {
+      entryFeeType: 'Instruct',
+      commission: { type: 'percentage', value: 2 },
+      buyerFees: {
+        adminFee: 1500,
+        buyerPremium: "3% of final sale price"
+      }
+    },
+
     images: [
       "https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&q=80&w=1200",
       "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=400"
     ],
     auctionDate: "24/03/2026",
-    legalPackAvailable: true
+    legalPackUrl: "#"
   };
 
   return (
     <div className={`container ${styles.page}`}>
       <div className={styles.header}>
-        <div className={styles.tag}>{property.tag}</div>
-        <h1>{property.title}</h1>
+        <div className={styles.tag}>{property.type} - {property.tenure}</div>
+        <h1>{property.headline}</h1>
         <div className={styles.metaRow}>
-          <span>📍 Southend-on-Sea, Essex</span>
-          <span>🏠 Freehold</span>
+          <span>📍 {property.addressLine1}, {property.townCity}</span>
           <span>📅 Auction: {property.auctionDate}</span>
+          <span>🔋 EPC: {property.epcRating}</span>
         </div>
       </div>
 
       <div className={styles.mainGrid}>
-        {/* Left Col: Imagery & Details */}
         <div className={styles.detailsCol}>
           <div className={styles.mainImage}>
-             <img src={property.images[0]} alt={property.title} />
+             <img src={property.images[0]} alt={property.headline} />
           </div>
           <div className={styles.thumbnails}>
              {property.images.map((img, i) => (
-               <img key={i} src={img} alt={`${property.title} thumbnail ${i}`} className={styles.thumb} />
+               <img key={i} src={img} alt={`${property.headline} thumbnail ${i}`} className={styles.thumb} />
              ))}
           </div>
 
           <section className={styles.section}>
-             <h2>Property Description</h2>
-             <p>{property.description}</p>
+             <h2>Description</h2>
+             <p className={styles.subheading}>{property.subheading}</p>
+             <p>{property.locationIntel}</p>
           </section>
 
           <section className={styles.section}>
-             <h2>Key Features</h2>
-             <ul className={styles.featureList}>
-                {property.features.map((f, i) => (
-                  <li key={i}>{f}</li>
-                ))}
-             </ul>
+             <h2>Accommodation</h2>
+             {property.accommodationSchedule.map((floor, idx) => (
+                <div key={idx} className={styles.floorBlock}>
+                   <h3>{floor.floorName}</h3>
+                   <div className={styles.roomList}>
+                      {floor.rooms.map((room, rIdx) => (
+                         <div key={rIdx} className={styles.roomItem}>
+                            <strong>{room.name}</strong>
+                            <span>{room.dimensions.imperial} ({room.dimensions.metric})</span>
+                         </div>
+                      ))}
+                   </div>
+                </div>
+             ))}
           </section>
 
           <section className={styles.section}>
-             <h2>Location</h2>
-             <div className={styles.mapPlaceholder}>
-                <p>Interactive Map View</p>
+             <h2>Material Information</h2>
+             <div className={styles.complianceGrid}>
+                <div className={styles.complianceItem}>
+                   <h5>Finance & Tax (Part A)</h5>
+                   <p><strong>Council Tax:</strong> {property.partA.councilTaxBand}</p>
+                   <p><strong>Qualifier:</strong> {property.partA.priceQualifier}</p>
+                </div>
+                <div className={styles.complianceItem}>
+                   <h5>Utilities & Physical (Part B)</h5>
+                   <p><strong>Construction:</strong> {property.partB.constructionType}</p>
+                   <p><strong>Utilities:</strong> {property.partB.utilitySources}</p>
+                   <p><strong>Parking:</strong> {property.partB.parking}</p>
+                </div>
+                <div className={styles.complianceItem}>
+                   <h5>Safety & Risks (Part C)</h5>
+                   <p><strong>Specific Issues:</strong> {property.partC.specificIssues}</p>
+                   <p><strong>Flood Risk:</strong> {property.partC.rightsRisks}</p>
+                </div>
              </div>
+          </section>
+
+          <section className={styles.section}>
+             <h2>Viewing Arrangements</h2>
+             <p>{property.viewingArrangements}</p>
           </section>
         </div>
 
-        {/* Right Col: Bidding & Legal */}
         <aside className={styles.sidebar}>
           <div className={styles.bidBox}>
              <div className={styles.priceHead}>
-                <span>Guide Price</span>
-                <h3>{property.guidePrice}</h3>
+                <span>{property.partA.priceQualifier}</span>
+                <h3>{property.pricing.guidePrice}</h3>
              </div>
              <p className={styles.bidNote}>Fall of the hammer creates a legally binding contract.</p>
              <button className={`btn btn-primary ${styles.bidBtn}`}>Register to Bid</button>
-             <button className={`btn btn-secondary ${styles.valuationBtn}`}>Proxy/Telephone bid</button>
           </div>
 
           <div className={styles.actionCard}>
-             <h3>Important Documents</h3>
-             <p>Register to view the comprehensive legal pack for this property.</p>
+             <h3>Financial Summary</h3>
+             <ul className={styles.featureList}>
+                <li><strong>Admin Fee:</strong> £{property.feesCommission.buyerFees.adminFee}</li>
+                <li><strong>Buyer Premium:</strong> {property.feesCommission.buyerFees.buyerPremium}</li>
+                <li><strong>Tenure:</strong> {property.tenure}</li>
+             </ul>
              <Link href="/register" className={styles.actionBtn}>
                 <span>📄</span>
                 <span>Download Legal Pack</span>
              </Link>
-             <Link href="/contact" className={styles.actionBtn}>
-                <span>📞</span>
-                <span>Request Viewing</span>
-             </Link>
           </div>
 
           <div className={styles.contactExpert}>
-             <h3>Have a question?</h3>
-             <p>Our auction specialists are ready to help.</p>
+             <h3>Expert Assistance</h3>
+             <p>Have questions about Part B or C compliance?</p>
              <a href="tel:02031740330" className={styles.phoneLink}>0203 174 0330</a>
           </div>
         </aside>
@@ -99,3 +181,4 @@ export default function PropertyDetails({ params }: { params: { id: string } }) 
     </div>
   );
 }
+
