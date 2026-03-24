@@ -1,137 +1,256 @@
 .page {
-  padding: 4rem 0;
-  min-height: 80vh;
+  padding: 4rem 0 8rem 0;
+  background: white;
+  min-height: 100vh;
 }
 
 .hero {
-  text-align: center;
-  max-width: 850px;
-  margin: 0 auto 5rem auto;
+  padding: 6rem 0;
+  background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+  margin-top: -4rem;
+  margin-bottom: 5rem;
+  border-bottom: 1px solid var(--color-border);
 }
 
-.hero h1 {
-  font-size: 3.2rem;
-  margin-bottom: 1.5rem;
-  color: var(--color-secondary);
+.heroContent {
+  max-width: 800px;
 }
 
-.hero p {
-  font-size: 1.25rem;
-  color: var(--color-text-muted);
-}
-
-.content {
-  display: grid;
-  grid-template-columns: 1.5fr 1fr;
-  gap: 5rem;
-  align-items: flex-start;
-}
-
-.formContainer {
-  background: white;
-  padding: 4rem;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-subtle);
-}
-
-.offerForm h2 {
-  font-size: 2rem;
-  margin-bottom: 2.5rem;
-  color: var(--color-brand-4);
-}
-
-.inputGroup {
+.badge {
+  display: inline-block;
+  padding: 0.6rem 1.2rem;
+  background-color: var(--color-secondary);
+  color: white;
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1rem;
   margin-bottom: 2rem;
 }
 
-.inputGroup label {
-  display: block;
-  font-size: 0.9rem;
+.heroContent h1 {
+  font-size: 3.5rem;
+  line-height: 1.1;
+  color: var(--color-brand-4);
+  margin-bottom: 2rem;
+}
+
+.heroContent p {
+  font-size: 1.25rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  margin-bottom: 3.5rem;
+}
+
+.uspGrid {
+  display: flex;
+  gap: 3rem;
+  flex-wrap: wrap;
+}
+
+.uspItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
   font-weight: 600;
-  margin-bottom: 0.8rem;
-  text-transform: uppercase;
-  color: var(--color-text-main);
+  color: var(--color-brand-4);
 }
 
-.inputGroup input, 
-.inputGroup select, 
-.inputGroup textarea {
-  width: 100%;
-  padding: 1rem 1.2rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background-color: #f9f9f9;
-  font-family: inherit;
-  font-size: 1rem;
+.uspIcon {
+  font-size: 1.5rem;
 }
 
-.submitBtn {
-  width: 100%;
-  padding: 1.2rem;
-  font-size: 1.2rem;
-  margin-top: 1rem;
+/* Layout */
+.contentGrid {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 6rem;
+  align-items: flex-start;
 }
 
-.benefitsAside {
+.infoLeft {
+  padding-right: 2rem;
+}
+
+.infoLeft h2 {
+  font-size: 2.2rem;
+  margin-bottom: 1.5rem;
+  color: var(--color-brand-4);
+}
+
+.steps {
+  margin: 4rem 0;
   display: flex;
   flex-direction: column;
   gap: 3rem;
 }
 
-.benefitBox {
-  background: var(--color-bg-light);
+.step {
+  display: flex;
+  gap: 2rem;
+}
+
+.stepNum {
+  min-width: 50px;
+  height: 50px;
+  background-color: var(--color-primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  box-shadow: 0 10px 20px rgba(132, 97, 166, 0.2);
+}
+
+.step h4 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-brand-4);
+}
+
+.quoteBox {
+  background: rgba(132, 97, 166, 0.03);
   padding: 3rem;
-  border-radius: var(--radius-lg);
+  border-radius: 32px;
+  border-left: 6px solid var(--color-primary);
+}
+
+.quoteBox p {
+  font-size: 1.2rem;
+  font-style: italic;
+  color: var(--color-brand-4);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.quoteBox span {
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+/* Form Styles */
+.formSidebar {
+  position: sticky;
+  top: 120px;
+}
+
+.offerForm {
+  background: white;
+  padding: 3rem;
+  border-radius: 32px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
   border: 1px solid var(--color-border);
 }
 
-.benefitBox h3 {
-  font-size: 1.5rem;
-  margin-bottom: 2rem;
+.offerForm h3 {
+  font-size: 1.6rem;
+  margin-bottom: 0.5rem;
   color: var(--color-brand-4);
 }
 
-.benefitList {
+.offerForm p {
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  margin-bottom: 2rem;
+}
+
+.formGroup {
+  margin-bottom: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 0.6rem;
 }
 
-.benefitList li {
-  font-size: 1.05rem;
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 120px;
+  gap: 1rem;
+}
+
+.divider {
+  padding: 1rem 0;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
   color: var(--color-text-muted);
-  line-height: 1.6;
+  letter-spacing: 0.05rem;
 }
 
-.benefitList li strong {
+.formGroup label {
+  font-size: 0.85rem;
+  font-weight: 600;
   color: var(--color-brand-4);
-  display: block;
-  margin-bottom: 0.2rem;
 }
 
-.trustBadge {
-  background: var(--color-brand-4);
-  color: white;
-  padding: 3rem;
-  border-radius: var(--radius-lg);
-  text-align: center;
-}
-
-.trustBadge h3 {
-  font-size: 1.5rem;
-  margin-bottom: 1.2rem;
-  color: var(--color-secondary);
-}
-
-.trustBadge p {
-  opacity: 0.8;
+.formGroup input, .formGroup select {
+  padding: 0.9rem 1.2rem;
+  border: 1px solid var(--color-border-light);
+  border-radius: 12px;
   font-size: 0.95rem;
+}
+
+.submitBtn {
+  width: 100%;
+  padding: 1.2rem;
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  margin: 1rem 0 1.5rem 0;
+}
+
+.submitBtn:hover {
+  background-color: var(--color-brand-4);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.formFooter {
+  font-size: 0.8rem !important;
+  text-align: center;
+  margin-bottom: 0 !important;
+}
+
+/* Success Card */
+.successCard {
+  max-width: 600px;
+  margin: 100px auto;
+  text-align: center;
+  padding: 5rem;
+  background: white;
+  border-radius: 40px;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.1);
+}
+
+.successIcon {
+  font-size: 5rem;
+  margin-bottom: 2rem;
+}
+
+.successCard h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  color: var(--color-brand-4);
+}
+
+.successCard p {
+  font-size: 1.15rem;
+  color: var(--color-text-muted);
+  margin-bottom: 3rem;
   line-height: 1.6;
 }
 
-@media (max-width: 992px) {
-  .content {
+@media (max-width: 1100px) {
+  .contentGrid {
     grid-template-columns: 1fr;
     gap: 4rem;
   }

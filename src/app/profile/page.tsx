@@ -6,13 +6,15 @@ import Link from 'next/link';
 import styles from './profile.module.css';
 import { auth, db } from '@/lib/firebase';
 import { onAuthStateChanged, signOut, updateProfile as updateAuthProfile } from 'firebase/auth';
-import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '@/lib/firebase';
 import { UserProfile } from '@/lib/types';
 
 type Tab = 'DASHBOARD' | 'PROFILE' | 'REQUIREMENTS' | 'SAVED' | 'BIDS' | 'SETTINGS' | 'ADMIN_CONSOLE';
 type ProfileSubTab = 'IDENTITY' | 'BIDDING';
+
+const PROFANITY_LIST = ['badword1', 'badword2', 'f***', 's***', 'a******']; // Placeholder for a real list
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -22,12 +24,24 @@ export default function ProfilePage() {
   const [isSaving, setIsSaving] = useState(false);
   
   // Real User Data from Firestore
-  const [profile, setProfile] = useState<Partial<UserProfile & { role: string; status: string; branch: string; idProof?: string; addressProof?: string }>>({
+  const [profile, setProfile] = useState<Partial<UserProfile & { 
+    role: string; 
+    status: string; 
+    branch: string; 
+    idProof?: string; 
+    addressProof?: string;
+    homeEmail: string;
+    workEmail: string;
+    primaryEmail: 'HOME' | 'WORK';
+  }>>({
     uid: '',
     firstName: '',
     surname: '',
     displayName: '',
     email: '',
+    homeEmail: '',
+    workEmail: '',
+    primaryEmail: 'HOME',
     mobile: '',
     role: 'Member',
     status: 'Active',
@@ -50,6 +64,9 @@ export default function ProfilePage() {
               uid: user.uid,
               displayName: user.displayName || '',
               email: user.email || '',
+              homeEmail: user.email || '',
+              workEmail: '',
+              primaryEmail: 'HOME',
               firstName: user.displayName?.split(' ')[0] || '',
               surname: user.displayName?.split(' ').slice(1).join(' ') || '',
               role: (user.uid === 'G9S36zhuhKQeDXW0YgBY28FdLTZ2' || user.email === 'Andrew@AuctionDepartment.com') ? 'Global Administrator' : 'Member',
@@ -98,6 +115,80 @@ export default function ProfilePage() {
     }
   };
 
+  const checkDisplayName = async (name: string) => {
+    // 1. Profanity check
+    const lowered = name.toLowerCase();
+    for (const word of PROFANITY_LIST) {
+      if (lowered.includes(word)) return 'OFFENSIVE';
+    }
+
+    // 2. Uniqueness check
+    const usersRef = collection(db, "users");
+    const q = query(usersRef, where("displayName", "==", name));
+    const querySnapshot = await getDocs(q);
+    
+    // If someone else has it
+    let isOther = false;
+    querySnapshot.forEach((doc) => {
+      if (doc.id !== auth.currentUser?.uid) isOther = true;
+    });
+
+    if (isOther) return 'TAKEN';
+    return 'OK';
+  };
+
+  const handleUpdateFullProfile = async () => {
+    if (!auth.currentUser) return;
+    setIsSaving(true);
+    try {
+      // Validate Display Name
+      if (profile.displayName) {
+        const result = await checkDisplayName(profile.displayName);
+        if (result === 'OFFENSIVE') {
+          alert('Display name contains restricted language. Please choose another.');
+          return;
+        }
+        if (result === 'TAKEN') {
+          alert('This display name is already taken by another user.');
+          return;
+        }
+      }
+
+      // Update Firestore
+      const docRef = doc(db, "users", auth.currentUser.uid);
+      await setDoc(docRef, {
+        firstName: profile.firstName,
+        surname: profile.surname,
+        displayName: profile.displayName,
+        homeEmail: profile.homeEmail || '',
+        workEmail: profile.workEmail || '',
+        primaryEmail: profile.primaryEmail || 'HOME',
+        title: profile.title || '',
+        mobile: profile.mobile || '',
+        telephone: profile.telephone || '',
+        addressLine1: profile.addressLine1 || '',
+        addressLine2: profile.addressLine2 || '',
+        townCity: profile.townCity || '',
+        county: profile.county || '',
+        postcode: profile.postcode || '',
+        country: profile.country || 'United Kingdom',
+        role: profile.role || 'Member',
+        status: profile.status || 'Active'
+      }, { merge: true });
+      
+      // Update email in Auth if primary changed
+      // Note: This requires the user to re-authenticate or a more complex flow, 
+      // so we mostly track it in Firestore for TAD platform use.
+
+      alert('Profile updated successfully!');
+    } catch (error) {
+      console.error("Profile update failed:", error);
+      alert('Failed to update profile.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleDocumentUpload = async (e: React.ChangeEvent<HTMLInputElement>, docType: 'idProof' | 'addressProof') => {
     const file = e.target.files?.[0];
     if (!file || !auth.currentUser) return;
@@ -116,38 +207,6 @@ export default function ProfilePage() {
     } catch (error) {
       console.error("Document upload failed:", error);
       alert('Failed to upload document.');
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleUpdateFullProfile = async () => {
-    if (!auth.currentUser) return;
-    setIsSaving(true);
-    try {
-      const docRef = doc(db, "users", auth.currentUser.uid);
-      await setDoc(docRef, {
-        firstName: profile.firstName,
-        surname: profile.surname,
-        displayName: profile.displayName,
-        workEmail: profile.workEmail || '',
-        homeEmail: profile.homeEmail || '',
-        title: profile.title || '',
-        mobile: profile.mobile || '',
-        telephone: profile.telephone || '',
-        addressLine1: profile.addressLine1 || '',
-        addressLine2: profile.addressLine2 || '',
-        townCity: profile.townCity || '',
-        county: profile.county || '',
-        postcode: profile.postcode || '',
-        country: profile.country || 'United Kingdom',
-        role: profile.role || 'Member',
-        status: profile.status || 'Active'
-      }, { merge: true });
-      alert('Profile updated successfully!');
-    } catch (error) {
-      console.error("Profile update failed:", error);
-      alert('Failed to update profile.');
     } finally {
       setIsSaving(false);
     }
@@ -306,12 +365,45 @@ export default function ProfilePage() {
                           onChange={(e) => setProfile({...profile, displayName: e.target.value})}
                         />
                       </div>
-                      <div className={styles.fullWidth}>
-                        <label>Email Address</label>
+                      
+                      {/* Email Section */}
+                      <div className={styles.formGroup}>
+                        <div className={styles.labelWithCheck}>
+                          <label>Home Email Address</label>
+                          <div className={styles.primaryEmailCheck}>
+                            <input 
+                              type="radio" 
+                              name="primaryEmail" 
+                              checked={profile.primaryEmail === 'HOME'}
+                              onChange={() => setProfile({...profile, primaryEmail: 'HOME'})}
+                            />
+                            <span>Primary</span>
+                          </div>
+                        </div>
                         <input 
                           type="email" 
-                          value={profile.email || ''} 
-                          disabled
+                          value={profile.homeEmail} 
+                          onChange={(e) => setProfile({...profile, homeEmail: e.target.value})}
+                        />
+                      </div>
+
+                      <div className={styles.formGroup}>
+                        <div className={styles.labelWithCheck}>
+                          <label>Work Email Address</label>
+                          <div className={styles.primaryEmailCheck}>
+                            <input 
+                              type="radio" 
+                              name="primaryEmail" 
+                              checked={profile.primaryEmail === 'WORK'}
+                              onChange={() => setProfile({...profile, primaryEmail: 'WORK'})}
+                            />
+                            <span>Primary</span>
+                          </div>
+                        </div>
+                        <input 
+                          type="email" 
+                          value={profile.workEmail} 
+                          onChange={(e) => setProfile({...profile, workEmail: e.target.value})}
                         />
                       </div>
                     </form>
@@ -320,7 +412,7 @@ export default function ProfilePage() {
                   <div className={styles.splitSection}>
                     <h3><span className={styles.sideIcon}>📍</span> Address</h3>
                     <form className={styles.formGridCompact}>
-                      <div className={styles.fullWidth}>
+                      <div className={styles.formGroup}>
                         <label>Address Line 1</label>
                         <input 
                           type="text" 
@@ -328,7 +420,7 @@ export default function ProfilePage() {
                           onChange={(e) => setProfile({...profile, addressLine1: e.target.value})}
                         />
                       </div>
-                      <div className={styles.fullWidth}>
+                      <div className={styles.formGroup}>
                         <label>Address Line 2 (Optional)</label>
                         <input 
                           type="text" 

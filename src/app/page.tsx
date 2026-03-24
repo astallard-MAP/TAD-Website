@@ -7,7 +7,7 @@ export default function Home() {
       {/* Hero Section */}
       <section className={styles.hero}>
         <div className={styles.heroContent}>
-          <h1>Land & Property Auctions Redefined.</h1>
+          <h1>Land & Property Auctions</h1>
           <p>
             Experience the UK&apos;s most professional and transparent auction platform. 
             Whether you are expanding your portfolio or seeking an immediate sale, 

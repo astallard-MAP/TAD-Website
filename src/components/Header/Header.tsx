@@ -28,9 +28,14 @@ const Header = () => {
     };
   }, []);
 
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
+
   const handleLogout = async () => {
     try {
       await signOut(auth);
+      setDropdownOpen(false);
       router.push('/');
     } catch (error) {
       console.error("Sign out failed:", error);
@@ -49,15 +54,18 @@ const Header = () => {
             <li><Link href="/properties" className={styles.navLink}>Properties</Link></li>
             <li><Link href="/sell" className={styles.navLink}>Sell</Link></li>
             <li><Link href="/buy" className={styles.navLink}>Buy</Link></li>
-            <li><Link href="/valuation" className={styles.navLink}>Valuation</Link></li>
-            <li><Link href="/calendar" className={styles.navLink}>Auction Dates</Link></li>
+            <li><Link href="/instant-offer" className={styles.navLink}>Get an Instant Offer</Link></li>
           </ul>
         </nav>
 
         <div className={styles.actions}>
           {user ? (
             <div className={styles.userSection}>
-              <Link href="/profile" className={styles.profileIndicator}>
+              <div 
+                className={styles.avatarTrigger} 
+                onClick={toggleDropdown}
+                aria-expanded={dropdownOpen}
+              >
                 {user.photoURL ? (
                   <img src={user.photoURL} alt={user.displayName || 'User'} className={styles.userAvatar} />
                 ) : (
@@ -65,9 +73,22 @@ const Header = () => {
                     {(user.displayName || user.email || 'U')[0].toUpperCase()}
                   </div>
                 )}
-                <span className={styles.userName}>{user.displayName?.split(' ')[0] || 'My Portal'}</span>
-              </Link>
-              <button onClick={handleLogout} className={styles.logoutText}>Sign Out</button>
+              </div>
+              
+              {dropdownOpen && (
+                <div className={styles.dropdown}>
+                  <Link 
+                    href="/profile" 
+                    className={styles.dropdownItem}
+                    onClick={() => setDropdownOpen(false)}
+                  >
+                    👤 Edit Profile
+                  </Link>
+                  <button onClick={handleLogout} className={styles.dropdownItem}>
+                    🚪 Sign Out
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <>

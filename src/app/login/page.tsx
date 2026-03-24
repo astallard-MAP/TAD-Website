@@ -56,7 +56,6 @@ export default function LoginPage() {
           <div className={styles.inputGroup}>
             <div className={styles.labelRow}>
               <label>Password</label>
-              <Link href="/forgot-password" className={styles.forgotPass}>Forgot password?</Link>
             </div>
             <input 
               type="password" 
@@ -66,6 +65,7 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               disabled={isLoading}
             />
+            <Link href="/forgot-password" className={styles.forgotPass}>Forgot password?</Link>
           </div>
           <button type="submit" className={`btn btn-primary ${styles.submitBtn}`} disabled={isLoading}>
             {isLoading ? 'Signing In...' : 'Sign In'}
