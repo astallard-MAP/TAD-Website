@@ -3,6 +3,7 @@ import "./globals.css";
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
 import FrankAI from "@/components/FrankAI/FrankAI";
+import ComingSoon from "@/components/ComingSoon/ComingSoon";
 
 export const viewport = {
   themeColor: '#8461a6',
@@ -23,7 +24,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en-GB">
-      <body>
+      <body style={{ position: 'relative' }}>
+        <ComingSoon />
         <Header />
         <main id="main-content">
           {children}

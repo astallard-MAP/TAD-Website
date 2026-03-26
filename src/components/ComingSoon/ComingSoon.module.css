@@ -1,0 +1,42 @@
+.container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--color-primary); /* #8461a6 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999999;
+  user-select: none;
+  cursor: default;
+  transition: opacity 0.5s ease;
+}
+
+.text {
+  color: white;
+  font-family: var(--font-heading);
+  font-size: clamp(3rem, 10vw, 6rem);
+  font-weight: 800; /* Bold */
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+
+.secretTrigger {
+  position: relative;
+  display: inline-block;
+}
+
+/* Precisely target the 'dot' area of the lowercase 'i' */
+.dotTrigger {
+  position: absolute;
+  top: 15%; 
+  left: 50%;
+  transform: translateX(-50%);
+  width: 15px;
+  height: 15px;
+  background: transparent;
+  cursor: default; /* Keep it non-obvious */
+  border-radius: 50%;
+}

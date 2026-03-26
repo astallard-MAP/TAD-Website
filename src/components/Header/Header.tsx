@@ -29,8 +29,10 @@ const Header = () => {
   }, []);
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
+  const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
 
   const handleLogout = async () => {
     try {
@@ -49,16 +51,23 @@ const Header = () => {
           <img src="/images/logo.png" alt="The Auction Department Logo" className={styles.logoImg} />
         </Link>
         
-        <nav className={styles.nav}>
+        <nav className={`${styles.nav} ${mobileMenuOpen ? styles.navActive : ''}`}>
           <ul className={styles.navList}>
-            <li><Link href="/properties" className={styles.navLink}>Properties</Link></li>
-            <li><Link href="/sell" className={styles.navLink}>Sell</Link></li>
-            <li><Link href="/buy" className={styles.navLink}>Buy</Link></li>
-            <li><Link href="/instant-offer" className={styles.navLink}>Get an Instant Offer</Link></li>
+            <li><Link href="/properties" className={styles.navLink} onClick={() => setMobileMenuOpen(false)}>Properties</Link></li>
+            <li><Link href="/sell" className={styles.navLink} onClick={() => setMobileMenuOpen(false)}>Sell</Link></li>
+            <li><Link href="/buy" className={styles.navLink} onClick={() => setMobileMenuOpen(false)}>Buy</Link></li>
+            <li><Link href="/instant-offer" className={styles.navLink} onClick={() => setMobileMenuOpen(false)}>Get an Instant Offer</Link></li>
           </ul>
         </nav>
 
         <div className={styles.actions}>
+          <button 
+            className={styles.mobileToggle} 
+            onClick={toggleMobileMenu}
+            aria-label="Toggle mobile menu"
+          >
+            {mobileMenuOpen ? '✕' : '☰'}
+          </button>
           {user ? (
             <div className={styles.userSection}>
               <div 

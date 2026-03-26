@@ -166,8 +166,54 @@
   color: var(--color-primary);
 }
 
+.mobileToggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  color: var(--color-brand-4);
+  cursor: pointer;
+  padding: 0.5rem;
+  z-index: 1002;
+}
+
 @media (max-width: 992px) {
+  .mobileToggle {
+    display: block;
+  }
+
   .nav {
-    display: none;
+    position: fixed;
+    top: 80px; /* Header height */
+    left: -100%;
+    width: 100%;
+    height: calc(100vh - 80px);
+    background-color: white;
+    flex-direction: column;
+    padding: 2rem;
+    transition: left 0.3s ease-in-out;
+    z-index: 1001;
+    display: flex; /* Override display: none from previous turn if any */
+    box-shadow: 0 10px 10px rgba(0,0,0,0.05);
+  }
+
+  .navActive {
+    left: 0;
+  }
+
+  .navList {
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .navLink {
+    font-size: 1.2rem;
+    width: 100%;
+    text-align: center;
+  }
+
+  .headerScrolled + .nav {
+    top: 70px;
   }
 }

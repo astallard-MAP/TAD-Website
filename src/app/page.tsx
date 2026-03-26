@@ -39,7 +39,7 @@ export default function Home() {
 
           <div className={styles.propertyGrid}>
             {/* Sample Property 1 */}
-            <div className={styles.card}>
+            <Link href="/properties/1" className={styles.card}>
               <div className={styles.cardImage}>
                 <img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&q=80&w=800" alt="Beautiful residential property" style={{width: '100%', height: '100%', objectFit: 'cover'}} />
               </div>
@@ -53,10 +53,10 @@ export default function Home() {
                   <span>Freehold</span>
                 </div>
               </div>
-            </div>
+            </Link>
 
             {/* Sample Property 2 */}
-            <div className={styles.card}>
+            <Link href="/properties/2" className={styles.card}>
               <div className={styles.cardImage}>
                 <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=800" alt="Commercial property opportunity" style={{width: '100%', height: '100%', objectFit: 'cover'}} />
               </div>
@@ -70,10 +70,10 @@ export default function Home() {
                   <span>Leasehold</span>
                 </div>
               </div>
-            </div>
+            </Link>
 
             {/* Sample Property 3 */}
-            <div className={styles.card}>
+            <Link href="/properties/3" className={styles.card}>
               <div className={styles.cardImage}>
                 <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=800" alt="Land development project" style={{width: '100%', height: '100%', objectFit: 'cover'}} />
               </div>
@@ -87,7 +87,7 @@ export default function Home() {
                   <span>Freehold</span>
                 </div>
               </div>
-            </div>
+            </Link>
           </div>
         </div>
       </section>
